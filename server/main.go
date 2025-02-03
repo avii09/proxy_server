@@ -17,6 +17,8 @@ var (
 func main() {
 	// Parse command-line arguments.
 	// This is done to dynamically set the port and origin server URL, instead of hardcoding them.
+
+	// user will start server => go run server/main.go --port <port_no> --origin <origin_server_url>
 	flag.StringVar(&port, "port", "8080", "Port on which the proxy server will run")
 	flag.StringVar(&originServer, "origin", "", "URL of the origin server")
 	flag.Parse()
