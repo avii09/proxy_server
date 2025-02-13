@@ -84,6 +84,7 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 	w.Write(body)
 }
 
+// steps:
 // HTTP Proxy Server – Listens for incoming client requests and routes them.
 // Cache Layer – Stores responses for reuse.
 // Origin Fetcher – Retrieves data from the origin server when needed.
