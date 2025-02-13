@@ -51,7 +51,7 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 	cachedResponse, err := cache.GetClient().Get(cache.Ctx, targetURL).Result()
 	if err == nil {
 		fmt.Println("Cache HIT")
-		w.Write([]byte(cachedResponse)) // Serve cached response
+		w.Write([]byte(cachedResponse)) // send cached response to client
 		return
 	}
 
@@ -64,27 +64,27 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 
-	// Copy response headers
+	// copy response headers
 	for key, values := range resp.Header {
 		for _, value := range values {
 			w.Header().Add(key, value)
 		}
 	}
 
-	// Copy response status code
+	// copy response status code
 	w.WriteHeader(resp.StatusCode)
 
-	// Read response body
+	// read response body
 	body, _ := io.ReadAll(resp.Body)
 
-	// Store response in Redis cache
-	cache.GetClient().Set(cache.Ctx, targetURL, body, 300*time.Second) // No expiration
+	// store response in Redis cache
+	cache.GetClient().Set(cache.Ctx, targetURL, body, 300*time.Second) // cache for 5 mins
 
-	// Send response to client
+	// send response to client
 	w.Write(body)
 }
 
 // steps:
 // HTTP Proxy Server – Listens for incoming client requests and routes them.
-// Cache Layer – Stores responses for reuse.
+// Cache Layer (Redis) – Stores responses for reuse.
 // Origin Fetcher – Retrieves data from the origin server when needed.
