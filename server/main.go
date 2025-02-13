@@ -38,10 +38,10 @@ func main() {
 
 // handleRequest will forward the incoming req to the origin server and return the response
 func handleRequest(w http.ResponseWriter, r *http.Request) {
-	// Construct the target URL
+	// construct the target URL
 	targetURL := originServer + r.URL.Path
 
-	// Forward request to the origin server
+	// forward request to the origin server
 	resp, err := http.Get(targetURL)
 	if err != nil {
 		http.Error(w, "Error contacting origin server", http.StatusBadGateway)
@@ -60,5 +60,9 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(resp.StatusCode)
 
 	// Copy response body
-	io.Copy(w, resp.Body)
+	io.Copy(w, resp.Body) // (dest,src)
 }
+
+// HTTP Proxy Server – Listens for incoming client requests and routes them.
+// Cache Layer – Stores responses for reuse.
+// Origin Fetcher – Retrieves data from the origin server when needed.
