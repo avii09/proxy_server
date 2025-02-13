@@ -7,6 +7,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
+
+	"github.com/avii09/proxy_server/cache"
 )
 
 var (
@@ -29,6 +32,9 @@ func main() {
 		os.Exit(1)
 	}
 
+	// initialize the cache
+	cache.InitRedis()
+
 	// Start the proxy server
 	fmt.Printf("Caching proxy server running on port %s, forwarding to %s\n", port, originServer)
 	http.HandleFunc("/", handleRequest)
@@ -41,6 +47,15 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 	// construct the target URL
 	targetURL := originServer + r.URL.Path
 
+	// try to get cached response
+	cachedResponse, err := cache.GetClient().Get(cache.Ctx, targetURL).Result()
+	if err == nil {
+		fmt.Println("Cache HIT")
+		w.Write([]byte(cachedResponse)) // Serve cached response
+		return
+	}
+
+	fmt.Println("Cache MISS")
 	// forward request to the origin server
 	resp, err := http.Get(targetURL)
 	if err != nil {
@@ -59,8 +74,14 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 	// Copy response status code
 	w.WriteHeader(resp.StatusCode)
 
-	// Copy response body
-	io.Copy(w, resp.Body) // (dest,src)
+	// Read response body
+	body, _ := io.ReadAll(resp.Body)
+
+	// Store response in Redis cache
+	cache.GetClient().Set(cache.Ctx, targetURL, body, 300*time.Second) // No expiration
+
+	// Send response to client
+	w.Write(body)
 }
 
 // HTTP Proxy Server – Listens for incoming client requests and routes them.
