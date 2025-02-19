@@ -38,7 +38,7 @@ This project is a caching proxy server built using Go and Redis. It forwards req
    ```bash
    go run server.go --port 3000 --origin http://dummyjson.com
    ```
-   You can change the port no. and the orgin server. 
+   You can change the port no. and the orgin server url. 
 
 
 ## Usage
