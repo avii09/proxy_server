@@ -20,7 +20,7 @@ This project is a caching proxy server built using Go and Redis. It forwards req
 ## Installation
 1. Clone the repository:
     ```bash
-    git clone https://github.com/avii09/proxy_server.git
+    git clone https://github.com/<user_name>/proxy_server.git
     cd proxy_server
     ```
 
